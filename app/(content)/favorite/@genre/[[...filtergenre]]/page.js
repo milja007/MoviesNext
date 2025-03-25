@@ -1,4 +1,3 @@
-// import MovieCard from "@/components/header/card/movieCard";
 import MovieCard from "@/components/header/card/movieCard";
 import getUniqueGenres, {
   getMoviesByGenre,
@@ -11,39 +10,38 @@ import Link from "next/link";
 //capturing dynamic data se zove
 const GenreMovie = async function ({ params }) {
   // const movies = getMoviesByGenre(genreMovies);
-  const { filtergenre } = await params;
+  const { filtergenre } = params;
   let genres = getUniqueGenres();
   const selectedGenre = filtergenre?.[0];
   const selectedYear = filtergenre?.[1];
-  let movies;
-  if (selectedGenre && !selectedYear) {
-    movies = getMoviesByGenre(selectedGenre);
-    genres = getMovieYearsByGenre(selectedGenre);
+  let moviesContent = null;
+  let movies = [];
+
+  if (selectedGenre) {
+    if (!selectedYear) {
+      movies = getMoviesByGenre(selectedGenre);
+      genres = getMovieYearsByGenre(selectedGenre);
+    } else {
+      movies = getMoviesByGenreAndYear(selectedGenre, selectedYear);
+      genres = [];
+    }
+
+    if (movies.length > 0) {
+      moviesContent = <MovieCard movies={movies} />;
+    } else {
+      moviesContent = <p>No movies found for your selected feature!</p>;
+    }
   }
-  if (selectedGenre && selectedYear) {
-    movies = getMoviesByGenreAndYear(selectedGenre, selectedYear);
-    genres = [];
-  }
-  let moviesContent = <p>No movies found for your selected feature!</p>;
-  if (movies && movies.length > 0) {
-    moviesContent = <MovieCard movies={movies} />;
-  }
+
   if (
     (selectedGenre && !getUniqueGenres().includes(selectedGenre)) ||
     (selectedYear &&
-      !getMovieYearsByGenre(selectedGenre).includes(selectedYear))
+      !getMovieYearsByGenre(selectedGenre)?.includes(selectedYear))
   ) {
     throw new Error("This page not found, Invalid path name");
   }
+
   return (
-    // <div>
-    //   <ul>
-    //     {movies.map((movie) => (
-    //       <li key={movie.id}>{movie.title}</li>
-    //     ))}
-    //   </ul>
-    //   <MovieCard movies={movies} />
-    // </div>
     <div>
       <ul className="ul">
         {genres.map((genre) => {
@@ -56,13 +54,8 @@ const GenreMovie = async function ({ params }) {
             </li>
           );
         })}
-        {/* {genres.map((genre) => (
-          <li key={genre}>
-            <Link href={`/favorite/${genre}`}>{genre}</Link>
-          </li>
-        ))} */}
       </ul>
-      {moviesContent}
+      {selectedGenre && moviesContent}
     </div>
   );
 };
