@@ -1,22 +1,24 @@
-"use client";
-import { fetchData } from "@/lib/apiCall";
-import { useState, useEffect } from "react";
+// "use client";
+// import { fetchData } from "@/lib/apiCall";
+// import { useState, useEffect } from "react";
+import { fetchMovies } from "@/lib/apiCall";
 import MovieCard from "@/components/header/card/movieCard";
 
-const MoviePage = () => {
-  const [moviesData, setMoviesData] = useState({
-    loading: true,
-    error: null,
-    data: null,
-  });
+const MoviePage = async () => {
+  const movies = await fetchMovies();
+  // const [moviesData, setMoviesData] = useState({
+  //   loading: true,
+  //   error: null,
+  //   data: null,
+  // });
 
-  useEffect(() => {
-    const fetchMovies = async () => {
-      const data = await fetchData();
-      setMoviesData(data);
-    };
-    fetchMovies();
-  }, []);
+  // useEffect(() => {
+  //   const fetchMovies = async () => {
+  //     const data = await fetchData();
+  //     setMoviesData(data);
+  //   };
+  //   fetchMovies();
+  // }, []);
 
   return (
     <div>
@@ -41,11 +43,12 @@ const MoviePage = () => {
               </Link>
             </li>
           ))}
-        </ul> */}
-        {moviesData.loading && <p>Loading Movies...</p>}
+       </ul> 
+         {moviesData.loading && <p>Loading Movies...</p>}
         {moviesData.error && <p>Error:{moviesData.error}</p>}
-        {moviesData.data && <MovieCard movies={moviesData.data} />}
-        {/* <MovieCard movies={movies} /> */}
+        {moviesData.data && <MovieCard movies={moviesData.data} />} */}
+
+        <MovieCard movies={movies} />
       </main>
     </div>
   );
