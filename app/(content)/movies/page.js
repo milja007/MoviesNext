@@ -1,9 +1,23 @@
-import fakeData from "@/data/fake-data";
-import Link from "next/link";
-import Image from "next/image";
+"use client";
+import { fetchData } from "@/lib/apiCall";
+import { useState, useEffect } from "react";
 import MovieCard from "@/components/header/card/movieCard";
 
 const MoviePage = () => {
+  const [moviesData, setMoviesData] = useState({
+    loading: true,
+    error: null,
+    data: null,
+  });
+
+  useEffect(() => {
+    const fetchMovies = async () => {
+      const data = await fetchData();
+      setMoviesData(data);
+    };
+    fetchMovies();
+  }, []);
+
   return (
     <div>
       <header>
@@ -28,7 +42,10 @@ const MoviePage = () => {
             </li>
           ))}
         </ul> */}
-        <MovieCard movies={fakeData} />
+        {moviesData.loading && <p>Loading Movies...</p>}
+        {moviesData.error && <p>Error:{moviesData.error}</p>}
+        {moviesData.data && <MovieCard movies={moviesData.data} />}
+        {/* <MovieCard movies={movies} /> */}
       </main>
     </div>
   );

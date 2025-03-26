@@ -10,7 +10,7 @@ import Link from "next/link";
 //capturing dynamic data se zove
 const GenreMovie = async function ({ params }) {
   // const movies = getMoviesByGenre(genreMovies);
-  const { filtergenre } = params;
+  const { filtergenre } = await params;
   let genres = getUniqueGenres();
   const selectedGenre = filtergenre?.[0];
   const selectedYear = filtergenre?.[1];
