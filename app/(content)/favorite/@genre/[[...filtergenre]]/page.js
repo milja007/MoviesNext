@@ -1,44 +1,28 @@
-import MovieCard from "@/components/header/card/movieCard";
-import getUniqueGenres, {
-  getMoviesByGenre,
-  getMoviesByGenreAndYear,
-  getMovieYearsByGenre,
-} from "@/lib/movies";
+import { getMovieYearsByGenre } from "@/lib/apiCall";
 import Link from "next/link";
+import getUniqueGenres from "@/lib/movies";
+import FilterMovies from "@/components/header/suspense/filtered-movies";
+import { Suspense } from "react";
+import SuspenseLoading from "@/components/header/suspense/suspense-loading";
 
-//KO NEKA LUDA PROPS /PARALEL KURCINA PO IMENU OVDJE genres
-//capturing dynamic data se zove
 const GenreMovie = async function ({ params }) {
-  // const movies = getMoviesByGenre(genreMovies);
   const { filtergenre } = await params;
   let genres = getUniqueGenres();
+  const genreMap = {
+    Adventure: 12,
+    Animation: 16,
+    Horror: 27,
+    History: 36,
+  };
   const selectedGenre = filtergenre?.[0];
   const selectedYear = filtergenre?.[1];
-  let moviesContent = null;
-  let movies = [];
+  const selectedGenreNumber = genreMap[selectedGenre];
 
-  if (selectedGenre) {
-    if (!selectedYear) {
-      movies = getMoviesByGenre(selectedGenre);
-      genres = getMovieYearsByGenre(selectedGenre);
-    } else {
-      movies = getMoviesByGenreAndYear(selectedGenre, selectedYear);
-      genres = [];
-    }
-
-    if (movies.length > 0) {
-      moviesContent = <MovieCard movies={movies} />;
-    } else {
-      moviesContent = <p>No movies found for your selected feature!</p>;
-    }
+  if (selectedGenreNumber && !selectedYear) {
+    genres = await getMovieYearsByGenre(selectedGenreNumber);
   }
-
-  if (
-    (selectedGenre && !getUniqueGenres().includes(selectedGenre)) ||
-    (selectedYear &&
-      !getMovieYearsByGenre(selectedGenre)?.includes(selectedYear))
-  ) {
-    throw new Error("This page not found, Invalid path name");
+  if (selectedGenre && selectedYear) {
+    genres = [];
   }
 
   return (
@@ -55,7 +39,14 @@ const GenreMovie = async function ({ params }) {
           );
         })}
       </ul>
-      {selectedGenre && moviesContent}
+      <Suspense fallback={<SuspenseLoading />}>
+        <FilterMovies
+          selectedGenreNumber={selectedGenreNumber}
+          selectedYear={selectedYear}
+        />
+      </Suspense>
+
+      {/* {selectedGenre && moviesContent} */}
     </div>
   );
 };
